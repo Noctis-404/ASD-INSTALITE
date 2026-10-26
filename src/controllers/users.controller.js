@@ -79,10 +79,27 @@ async function list(req, res) {
       }
     }
 
+    // sortBy & order
+    const sortBy = req.query.sortBy || "createdAt";
+    const allowedSortBy = ["username", "fullname", "createdAt"];
+    if (!allowedSortBy.includes(sortBy)) {
+      return res.status(400).json({
+        error: "sortBy must be one of: username, fullname, createdAt",
+      });
+    }
+
+    let order = "desc";
+    if (req.query.order && req.query.order.toLowerCase() === "asc") {
+      order = "asc";
+    }
+
+    const orderBy = [{ [sortBy]: order }];
+
     const { total, data } = await usersService.listUsers({
       where,
       skip: pagination.skip,
       take: pagination.take,
+      orderBy,
     });
 
     const meta = buildMeta(pagination.page, pagination.limit, total);

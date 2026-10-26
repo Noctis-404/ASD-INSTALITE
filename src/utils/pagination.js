@@ -3,19 +3,23 @@ function parsePagination(query) {
   let limit = 10;
 
   if (query.page !== undefined) {
-    const parsedPage = Number(query.page);
-    if (!Number.isInteger(parsedPage) || parsedPage <= 0) {
+    const pageStr = String(query.page);
+    if (!/^\d+$/.test(pageStr) || parseInt(pageStr, 10) <= 0) {
       return { error: "page and limit must be positive integers" };
     }
-    page = parsedPage;
+    page = parseInt(pageStr, 10);
   }
 
   if (query.limit !== undefined) {
-    const parsedLimit = Number(query.limit);
-    if (!Number.isInteger(parsedLimit) || parsedLimit <= 0) {
+    const limitStr = String(query.limit);
+    if (!/^\d+$/.test(limitStr) || parseInt(limitStr, 10) <= 0) {
       return { error: "page and limit must be positive integers" };
     }
-    limit = parsedLimit;
+    limit = parseInt(limitStr, 10);
+    // If it's more than 50, use 50 (don't error, just cap it)
+    if (limit > 50) {
+      limit = 50;
+    }
   }
 
   const skip = (page - 1) * limit;
